@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test App for AutoFix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .loading {
+            color: #666;
+        }
+        .error {
+            color: red;
+            border: 1px solid red;
+            padding: 10px;
+            border-radius: 4px;
+            background: #ffebee;
+        }
+        .user-profile {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .posts {
+            margin-top: 20px;
+        }
+        .post-title {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="loading">Loading...</div>
+    </div>
+
+    <script>
+        // Simulate the React component error in vanilla JS
+        class UserProfile {
+            constructor(userId) {
+                this.userId = userId;
+                this.user = null;
+                this.loading = true;
+                this.error = null;
+                this.init();
+            }
+
+            async init() {
+                try {
+                    await this.fetchUser();
+                    this.render();
+                } catch (err) {
+                    this.error = err.message;
+                    this.renderError();
+                }
+            }
+
+            async fetchUser() {
+                try {
+                    // This will cause an error if userId is undefined
+                    const response = await fetch(`/api/users/${this.userId}`);
+                    const data = await response.json();
+                    
+                    // This line will cause "Cannot read property 'map' of undefined" 
+                    // if data.posts is undefined or if the response doesn't contain posts
+                    const postTitles = data.posts.map(post => post.title);
+                    
+                    this.user = { ...data, postTitles };
+                    this.loading = false;
+                } catch (err) {
+                    this.error = err.message;
+                    this.loading = false;
+                    throw err;
+                }
+            }
+
+            render() {
+                const app = document.getElementById('app');
+                if (!this.user) {
+                    app.innerHTML = '<div class="error">User not found</div>';
+                    return;
+                }
+
+                app.innerHTML = `
+                    <div class="user-profile">
+                        <h1>${this.user.name}</h1>
+                        <p>${this.user.email}</p>
+                        <div class="posts">
+                            <h2>Recent Posts</h2>
+                            ${this.renderPosts()}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderPosts() {
+                // This will cause an error if this.user.postTitles is undefined
+                return this.user.postTitles.map((title, index) => 
+                    `<div class="post-title">${title}</div>`
+                ).join('');
+            }
+
+            renderError() {
+                const app = document.getElementById('app');
+                app.innerHTML = `<div class="error">Error: ${this.error}</div>`;
+            }
+        }
+
+        // Intentionally pass undefined to trigger errors
+        document.addEventListener('DOMContentLoaded', () => {
+            new UserProfile(undefined);
+        });
+
+        // Simulate a network error for testing
+        console.error('Test error: Failed to load user data');
+        console.warn('Warning: API endpoint not responding');
+    </script>
+</body>
+</html>
