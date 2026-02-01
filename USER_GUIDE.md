@@ -39,9 +39,9 @@ npm run build
 node dist/cli.js --help
 ```
 
-### Step 2: Setup LLM API Key
+### Step 2: Setup AI API Key
 
-AutoFix uses an LLM (Large Language Model) to analyze and fix code errors. You'll need an API key:
+AutoFix uses an AI (Artificial Intelligence) to analyze and fix code errors. You'll need an API key:
 
 #### Using OpenAI (Recommended)
 ```bash
@@ -71,19 +71,21 @@ Expected output:
 ```
 Usage: autofix [options]
 
-Automated Frontend Debugger - CLI tool that monitors frontend startup and fixes
-errors automatically
+Agentic Frontend Debugger & Validator - CLI tool that monitors frontend startup and fixes
+errors automatically using coordinated AI agents
 
 Options:
   -V, --version                output the version number
   -u, --url <url>              Frontend URL to monitor
   -p, --project <path>         Project directory containing source code
                                (default: "./")
-  -l, --llm-endpoint <url>     Custom LLM API endpoint
+  -l, --llm-endpoint <url>     Custom AI API endpoint
   -t, --timeout <ms>           Startup timeout in milliseconds (default:
                                "10000")
   -m, --max-attempts <number>  Maximum fix attempts (default: "5")
       --headless               Run in headless mode (default: false)
+      --agentic                Use agentic approach with coordinated agents
+                               (default: false)
       --config <path>          Path to config file (default: ".autofix.json")
   -h, --help                   display help for command
 ```
@@ -139,7 +141,7 @@ function App() {
 export default App;
 ```
 
-#### Run AutoFix
+#### Run AutoFix in Traditional Mode
 ```bash
 # Terminal 1: Make sure React app is running
 npm start
@@ -149,14 +151,31 @@ export AUTOFIX_LLM_API_KEY="your-api-key"
 autofix --url http://localhost:3000 --project ./src --max-attempts 3
 ```
 
-#### What Happens
+#### Run AutoFix in Agentic Mode (NEW!)
+```bash
+# Terminal 1: Make sure React app is running
+npm start
+
+# Terminal 2: Run AutoFix in agentic mode
+export AUTOFIX_LLM_API_KEY="your-api-key"
+autofix --url http://localhost:3000 --project ./src --agentic --max-attempts 3
+```
+
+#### What Happens in Traditional Mode
 1. AutoFix opens http://localhost:3000
 2. Detects the "Cannot read property 'name' of null" error
 3. Captures the console error and stack trace
-4. Sends context to LLM for analysis
-5. LLM suggests adding a null check
+4. Sends context to AI for analysis
+5. AI suggests adding a null check
 6. AutoFix applies the fix to `src/App.js`
 7. Refreshes the page to verify the fix
+
+#### What Happens in Agentic Mode (NEW!)
+1. **Agent Coordination**: Multiple specialized agents work together
+2. **LinkChecker Agent**: Validates all links in the application
+3. **AutoFix Agent**: Monitors startup, detects errors, and applies fixes
+4. **TestRunner Agent**: Validates fixes with comprehensive tests
+5. **Workflow Execution**: Coordinated workflow ensures all validation steps complete
 
 ### Scenario 2: Vue.js Development
 
@@ -189,10 +208,10 @@ export default {
 </script>
 ```
 
-#### Run AutoFix
+#### Run AutoFix in Agentic Mode
 ```bash
 export AUTOFIX_LLM_API_KEY="your-api-key"
-autofix --url http://localhost:5173 --project ./src --max-attempts 3
+autofix --url http://localhost:5173 --project ./src --agentic --max-attempts 3
 ```
 
 ### Scenario 3: Static HTML with JavaScript
@@ -226,14 +245,14 @@ const items = data.items.map(item => item.name); // Error: Cannot read property 
 document.getElementById('app').innerHTML = `<h1>Items: ${items.length}</h1>`;
 ```
 
-#### Run AutoFix
+#### Run AutoFix in Agentic Mode
 ```bash
 # Start a simple server
 python3 -m http.server 8000 &
 
-# Run AutoFix
+# Run AutoFix in agentic mode
 export AUTOFIX_LLM_API_KEY="your-api-key"
-autofix --url http://localhost:8000 --project . --headless --max-attempts 3
+autofix --url http://localhost:8000 --project . --agentic --headless --max-attempts 3
 ```
 
 ## ⚙️ Configuration
@@ -245,6 +264,7 @@ Create `.autofix.json` in your project root:
 {
   "url": "http://localhost:3000",
   "project": "./src",
+  "agentic": true,
   "llmEndpoint": "https://api.openai.com/v1",
   "timeout": 10000,
   "maxAttempts": 5,
@@ -278,14 +298,15 @@ autofix --url http://localhost:3000
 
 ## 🔧 Advanced Usage
 
-### Custom LLM Endpoint
-If you want to use a different LLM provider:
+### Custom AI Endpoint
+If you want to use a different AI provider:
 
 ```bash
 autofix \
   --url http://localhost:3000 \
   --project ./src \
-  --llm-endpoint https://your-custom-llm.com/v1 \
+  --llm-endpoint https://your-custom-ai.com/v1 \
+  --agentic \
   --max-attempts 10
 ```
 
@@ -294,6 +315,7 @@ autofix \
 autofix \
   --url http://localhost:3000 \
   --project ./src \
+  --agentic \
   --headless \
   --max-attempts 5 \
   --timeout 30000
@@ -302,15 +324,35 @@ autofix \
 ### High-Performance Monitoring
 ```bash
 # Longer timeout for heavy apps
-autofix --url http://localhost:3000 --timeout 60000
+autofix --url http://localhost:3000 --timeout 60000 --agentic
 
 # More attempts for complex bugs
-autofix --url http://localhost:3000 --max-attempts 10
+autofix --url http://localhost:3000 --agentic --max-attempts 10
 
 # Monitor multiple projects
-autofix --url http://localhost:3000 --project ./frontend
-autofix --url http://localhost:8000 --project ./backend
+autofix --url http://localhost:3000 --project ./frontend --agentic
+autofix --url http://localhost:8000 --project ./backend --agentic
 ```
+
+## 🤖 Agentic Architecture
+
+### AutoFix Agent
+- Error detection and analysis
+- Automated code fixing
+- Startup monitoring
+- Performance metrics collection
+
+### LinkChecker Agent
+- Link discovery and cataloging
+- Link validation and accessibility checking
+- Deep crawl analysis
+- Site structure mapping
+
+### TestRunner Agent
+- Unit testing execution
+- End-to-end browser testing
+- Visual regression testing
+- Security vulnerability scanning
 
 ## 🐛 Troubleshooting
 
@@ -332,7 +374,7 @@ ls -la ./src
 autofix --url http://localhost:3000 --project /full/path/to/src
 ```
 
-#### 3. LLM API errors
+#### 3. AI API errors
 ```bash
 # Verify your API key
 echo $AUTOFIX_LLM_API_KEY
@@ -375,6 +417,15 @@ npm install -g .
 autofix --help
 ```
 
+#### 6. Agentic Mode Issues
+```bash
+# Check that all agents are properly configured
+autofix --url http://localhost:3000 --agentic --verbose
+
+# Verify that agents can communicate properly
+# Check network connectivity and permissions
+```
+
 ### Debug Mode
 Get verbose output:
 
@@ -404,12 +455,13 @@ If AutoFix gets stuck:
 
 1. Check `autofix.log` for errors
 2. Verify the frontend URL is accessible
-3. Check your LLM API key and quota
+3. Check your AI API key and quota
 4. Try reducing `--max-attempts` and `--timeout`
+5. For agentic mode, verify all agents are properly configured
 
 ## 📊 Monitoring Results
 
-### Success Output
+### Traditional Mode Success Output
 ```
 🔧 AutoFix: Automated Frontend Debugger
 
@@ -418,7 +470,7 @@ If AutoFix gets stuck:
 ⏱️  Timeout: 10000ms
 🔄 Max Attempts: 5
 
-🚀 Starting AutoFix monitoring...
+🚀 Starting Traditional AutoFix monitoring...
 
 🔄 Attempt 1/5
 🔧 Monitoring frontend startup...
@@ -430,13 +482,34 @@ If AutoFix gets stuck:
 🎉 AutoFix complete!
 ```
 
+### Agentic Mode Success Output
+```
+🤖 Starting Agent-Based AutoFix...
+
+🔗 Running LinkChecker agent...
+📊 Found 5 total links, 0 broken links
+
+🔍 Running AutoFix monitoring...
+📊 Startup monitoring completed in 1500ms
+
+🔍 Running detailed error analysis...
+📊 Found 0 errors and 0 warnings
+
+🧪 Running post-fix validation tests...
+🧪 Tests: 12 passed, 0 failed
+
+✨ Frontend started successfully!
+📊 Fixed 0 errors in 1 attempts
+🎉 Agentic AutoFix complete!
+```
+
 ### Error and Fix Output
 ```
 🔄 Attempt 1/5
 🔧 Monitoring frontend startup...
 ❌ Error detected: TypeError: Cannot read property 'name' of null
 📝 Capturing console logs...
-🤖 Sending to LLM for analysis...
+🤖 Sending to AI for analysis...
 ✅ Fix applied: Updated user component to handle undefined state
 🔄 Refreshing page...
 
@@ -456,7 +529,7 @@ If AutoFix gets stuck:
 1. **Commit your code** - Always have version control
 2. **Run tests** - Ensure your test suite passes
 3. **Check environment** - Verify dev server is running
-4. **Set API key** - Ensure LLM access is configured
+4. **Set API key** - Ensure AI access is configured
 
 ### During AutoFix Operation
 1. **Monitor logs** - Watch the output for progress
@@ -470,6 +543,12 @@ If AutoFix gets stuck:
 3. **Commit fixes** - Save the working changes
 4. **Document issues** - Note any recurring problems
 
+### Agentic Mode Best Practices
+1. **Use for complex debugging scenarios** - Leverage coordinated agents
+2. **Combine with traditional mode** - For comprehensive coverage
+3. **Monitor agent health** - Check performance metrics
+4. **Regularly update agent configurations** - Keep agents current
+
 ### Integration Tips
 
 #### CI/CD Pipeline
@@ -479,6 +558,7 @@ export AUTOFIX_LLM_API_KEY=$OPENAI_API_KEY
 autofix \
   --url http://localhost:3000 \
   --project ./src \
+  --agentic \
   --headless \
   --max-attempts 3 \
   --timeout 30000
@@ -504,14 +584,14 @@ autofix --config ./config/dev.autofix.json
 autofix --config ./config/staging.autofix.json
 
 # Production (read-only check)
-autofix --url https://app.example.com --headless --max-attempts 1
+autofix --url https://app.example.com --agentic --headless --max-attempts 1
 ```
 
 ## 🆘 Getting Help
 
 ### Resources
 - **GitHub Repository**: https://github.com/asmeyatsky/autofix
-- **Documentation**: Check `README.md` and `USAGE.md`
+- **Documentation**: Check `README.md`, `USAGE.md`, and `AGENT_ARCHITECTURE.md`
 - **Examples**: See `examples/` directory
 
 ### Reporting Issues
@@ -529,6 +609,6 @@ Have ideas for improvement?
 
 ---
 
-**Happy debugging! 🎉** 
+**Happy debugging! 🎉**
 
 Remember: AutoFix is designed to assist developers, not replace them. Always review automated changes and use your judgment when applying fixes.

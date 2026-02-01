@@ -14,6 +14,7 @@ npm install autofix-cli
 
 ### 2. Basic Usage
 
+#### Traditional Mode
 ```bash
 # Monitor a running frontend
 autofix --url http://localhost:3000
@@ -21,8 +22,17 @@ autofix --url http://localhost:3000
 # With custom project directory
 autofix --url http://localhost:3000 --project ./src
 
-# With custom LLM endpoint
-autofix --url http://localhost:3000 --llm-endpoint https://your-llm-api.com/v1
+# With custom AI endpoint
+autofix --url http://localhost:3000 --llm-endpoint https://your-ai-api.com/v1
+```
+
+#### Agentic Mode (NEW!)
+```bash
+# Use coordinated AI agents for comprehensive validation and fixing
+autofix --url http://localhost:3000 --agentic
+
+# Agentic mode with custom settings
+autofix --url http://localhost:3000 --project ./src --agentic --timeout 30000 --max-attempts 5
 ```
 
 ### 3. Configuration File
@@ -33,6 +43,7 @@ Create `.autofix.json` in your project:
 {
   "url": "http://localhost:3000",
   "project": "./src",
+  "agentic": true,
   "llmEndpoint": "https://api.openai.com/v1",
   "timeout": 10000,
   "maxAttempts": 5,
@@ -56,48 +67,58 @@ autofix --url http://localhost:3000
 |--------|-------|-------------|----------|
 | `--url` | `-u` | Frontend URL to monitor | Required |
 | `--project` | `-p` | Project directory | `./` |
-| `--llm-endpoint` | `-l` | Custom LLM API endpoint | OpenAI |
+| `--llm-endpoint` | `-l` | Custom AI API endpoint | OpenAI |
 | `--timeout` | `-t` | Startup timeout (ms) | `10000` |
 | `--max-attempts` | `-m` | Maximum fix attempts | `5` |
 | `--headless` | | Run without UI | `false` |
+| `--agentic` | | Use agentic approach with coordinated agents | `false` |
 | `--config` | | Config file path | `.autofix.json` |
 | `--help` | `-h` | Show help | |
 
 ## How It Works
 
-### Step 1: Monitoring
+### Traditional Mode
 AutoFix opens your frontend URL and monitors for:
 - Console errors and warnings
 - Network request failures
 - Page load errors
 - JavaScript runtime errors
 
-### Step 2: Error Detection
 When errors are detected, AutoFix:
 - Captures console logs with stack traces
 - Records network failures
 - Takes screenshots for debugging
 - Identifies relevant source files
 
-### Step 3: LLM Analysis
-AutoFix sends error context to an LLM:
+AutoFix sends error context to an AI:
 - Error messages and stack traces
 - Relevant source files
 - Network error details
 - Framework and environment info
 
-### Step 4: Code Fixing
-The LLM provides fixes that AutoFix:
+The AI provides fixes that AutoFix:
 - Validates syntax and correctness
 - Creates backups before modifications
 - Applies targeted code changes
 - Maintains code style and best practices
 
-### Step 5: Verification
 After applying fixes:
 - Refreshes the page automatically
 - Re-monitors for remaining errors
 - Continues loop until success or max attempts
+
+### Agentic Mode (NEW!)
+In agentic mode, multiple specialized agents work together:
+
+1. **LinkChecker Agent**: Discovers and validates all links in your site
+2. **AutoFix Agent**: Monitors startup, detects errors, and applies fixes
+3. **TestRunner Agent**: Validates fixes with comprehensive tests
+
+The AgentOrchestrator coordinates these agents in a workflow:
+- Link validation
+- Error monitoring and analysis
+- Fix application
+- Post-fix testing and validation
 
 ## Examples
 
@@ -106,8 +127,11 @@ After applying fixes:
 # Start your React app
 npm start
 
-# In another terminal, run AutoFix
+# In another terminal, run AutoFix in traditional mode
 autofix --url http://localhost:3000 --project ./src
+
+# Or run in agentic mode for comprehensive validation
+autofix --url http://localhost:3000 --project ./src --agentic
 ```
 
 ### Vue Development
@@ -115,8 +139,8 @@ autofix --url http://localhost:3000 --project ./src
 # Vue CLI dev server
 npm run serve
 
-# Run AutoFix
-autofix --url http://localhost:8080 --project ./src --max-attempts 10
+# Run AutoFix in agentic mode
+autofix --url http://localhost:8080 --project ./src --agentic --max-attempts 10
 ```
 
 ### Angular Development
@@ -124,8 +148,8 @@ autofix --url http://localhost:8080 --project ./src --max-attempts 10
 # Angular dev server
 ng serve
 
-# Run AutoFix with longer timeout
-autofix --url http://localhost:4200 --project ./src --timeout 30000
+# Run AutoFix in agentic mode with longer timeout
+autofix --url http://localhost:4200 --project ./src --agentic --timeout 30000
 ```
 
 ### Static HTML Site
@@ -133,8 +157,8 @@ autofix --url http://localhost:4200 --project ./src --timeout 30000
 # Serve static files
 python -m http.server 8000
 
-# Run AutoFix
-autofix --url http://localhost:8000 --project . --headless
+# Run AutoFix in agentic mode
+autofix --url http://localhost:8000 --project . --agentic --headless
 ```
 
 ## Troubleshooting
@@ -150,13 +174,17 @@ autofix --url http://localhost:8000 --project . --headless
    - Check your `--project` path is correct
    - Ensure source files exist in the project directory
 
-3. **LLM API errors**
+3. **AI API errors**
    - Set `AUTOFIX_LLM_API_KEY` environment variable
-   - Verify your LLM endpoint is accessible
+   - Verify your AI endpoint is accessible
 
 4. **Browser fails to start**
    - Try `--headless` mode if no display available
    - Install Chromium dependencies if needed
+
+5. **Agentic mode issues**
+   - Ensure all required dependencies are installed
+   - Check that agents can communicate properly
 
 ### Debug Mode
 
@@ -167,14 +195,26 @@ DEBUG=puppeteer:* autofix --url http://localhost:3000
 
 ## Advanced Usage
 
-### Custom LLM Integration
+### Custom AI Integration
 
-Use a custom LLM endpoint:
+Use a custom AI endpoint:
 ```bash
 autofix \
   --url http://localhost:3000 \
   --project ./src \
-  --llm-endpoint https://your-custom-llm.com/v1
+  --llm-endpoint https://your-custom-ai.com/v1
+```
+
+### Agentic Mode with Custom Workflows
+
+Configure specific agent behaviors:
+```bash
+autofix \
+  --url http://localhost:3000 \
+  --project ./src \
+  --agentic \
+  --max-attempts 5 \
+  --headless
 ```
 
 ### CI/CD Integration
@@ -184,6 +224,7 @@ autofix \
 autofix \
   --url http://localhost:3000 \
   --project ./src \
+  --agentic \
   --max-attempts 3 \
   --headless \
   --timeout 30000
@@ -193,10 +234,10 @@ autofix \
 
 Create separate config files:
 ```bash
-# Project 1
+# Project 1 with traditional mode
 autofix --config ./project1/.autofix.json
 
-# Project 2  
+# Project 2 with agentic mode
 autofix --config ./project2/.autofix.json
 ```
 
@@ -211,11 +252,18 @@ autofix --config ./project2/.autofix.json
    - Set appropriate timeouts for your app
    - Adjust max attempts based on complexity
    - Use headless mode in CI/CD
+   - Enable agentic mode for comprehensive validation
 
 3. **After AutoFix**
    - Review applied changes
    - Run your test suite
    - Commit successful fixes
+
+4. **Agentic Mode Specific**
+   - Use for complex debugging scenarios
+   - Combine with traditional mode for comprehensive coverage
+   - Monitor agent health and performance metrics
+   - Regularly update agent configurations
 
 ## Support
 
