@@ -1,0 +1,38 @@
+{
+  "name": "corsutils-cli",
+  "version": "1.0.0",
+  "description": "CORS troubleshooting and configuration utility CLI tool",
+  "main": "dist/corsutils.js",
+  "bin": {
+    "corsutils": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "cors",
+    "troubleshooting",
+    "cli",
+    "development",
+    "frontend",
+    "backend"
+  ],
+  "author": "AutoFix Team",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "chalk": "^4.1.2",
+    "axios": "^1.6.0",
+    "inquirer": "^8.2.6",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/inquirer": "^9.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  }
+}
