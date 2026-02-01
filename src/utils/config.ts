@@ -11,6 +11,7 @@ export async function loadConfig(cliOptions: any): Promise<AutoFixConfig> {
     timeout: parseInt(cliOptions.timeout) || 10000,
     maxAttempts: parseInt(cliOptions.maxAttempts) || 5,
     headless: cliOptions.headless,
+    agentic: cliOptions.agentic,
   };
 
   // Load from config file if it exists

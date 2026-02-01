@@ -6,6 +6,7 @@ export interface AutoFixConfig {
   maxAttempts?: number;
   headless?: boolean;
   llmApiKey?: string;
+  agentic?: boolean;
 }
 
 export interface ConsoleMessage {

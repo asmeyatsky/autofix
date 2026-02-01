@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { AutoFixConfig } from './types';
 import { AutoFixEngine } from './core/autofix-engine';
+import { AgentBasedAutoFix } from './main-agents';
 import { loadConfig } from './utils/config';
 import { validateUrl } from './utils/validation';
 
@@ -22,6 +23,7 @@ program
   .option('-m, --max-attempts <number>', 'Maximum fix attempts', '5')
   .option('--headless', 'Run in headless mode', false)
   .option('--config <path>', 'Path to config file', '.autofix.json')
+  .option('--agentic', 'Use agentic approach with coordinated agents', false)
   .action(async (options) => {
     try {
       console.log(chalk.blue.bold('🔧 AutoFix: Automated Frontend Debugger'));
@@ -29,7 +31,7 @@ program
 
       // Load configuration
       const config = await loadConfig(options);
-      
+
       // Validate configuration
       if (!config.url || !validateUrl(config.url)) {
         console.error(chalk.red('❌ Error: Valid URL is required'));
@@ -40,15 +42,26 @@ program
       console.log(chalk.gray(`🌐 URL: ${config.url}`));
       console.log(chalk.gray(`⏱️  Timeout: ${config.timeout}ms`));
       console.log(chalk.gray(`🔄 Max Attempts: ${config.maxAttempts}`));
+      console.log(chalk.gray(`🤖 Agentic Mode: ${config.agentic ? 'ON' : 'OFF'}`));
       console.log('');
 
-      // Initialize and run AutoFix
-      const autofix = new AutoFixEngine(config);
-      
-      console.log(chalk.yellow('🚀 Starting AutoFix monitoring...'));
-      console.log('');
+      let result;
 
-      const result = await autofix.run();
+      if (config.agentic) {
+        console.log(chalk.yellow('🚀 Starting Agent-Based AutoFix...'));
+        console.log('');
+
+        // Initialize and run Agent-Based AutoFix
+        const agentBasedAutofix = new AgentBasedAutoFix(config);
+        result = await agentBasedAutofix.run();
+      } else {
+        console.log(chalk.yellow('🚀 Starting Traditional AutoFix...'));
+        console.log('');
+
+        // Initialize and run traditional AutoFix
+        const traditionalAutofix = new AutoFixEngine(config);
+        result = await traditionalAutofix.run();
+      }
 
       if (result.success) {
         console.log('');
