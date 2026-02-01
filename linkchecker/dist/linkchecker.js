@@ -35,10 +35,15 @@ class LinkChecker {
     }
     async check() {
         try {
-            // Initialize browser
+            // Initialize browser with more robust settings
             this.browser = await puppeteer_1.default.launch({
-                headless: true,
-                args: ['--no-sandbox', '--disable-setuid-sandbox']
+                headless: 'new',
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-web-security',
+                    '--disable-features=VizDisplayCompositor'
+                ]
             });
             // Start crawling
             this.queue.push(this.config.baseUrl);
@@ -47,9 +52,22 @@ class LinkChecker {
             this.stats.duration = this.stats.endTime.getTime() - this.stats.startTime.getTime();
             return this.results;
         }
+        catch (error) {
+            console.error('Browser error:', error);
+            // Return results collected so far even if browser fails
+            this.stats.endTime = new Date();
+            this.stats.duration = this.stats.endTime.getTime() - this.stats.startTime.getTime();
+            return this.results;
+        }
         finally {
-            if (this.browser) {
-                await this.browser.close();
+            try {
+                if (this.browser) {
+                    await this.browser.close();
+                }
+            }
+            catch (closeError) {
+                // Ignore close errors
+                console.warn('Browser close warning:', closeError instanceof Error ? closeError.message : String(closeError));
             }
         }
     }

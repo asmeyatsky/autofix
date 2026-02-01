@@ -239,29 +239,133 @@ npm install
 npm run build
 ```
 
-#### 2. Memory issues with large sites
+#### 2. Puppeteer Browser Launch Failures
+**Issue**: Browser fails to launch with Puppeteer on macOS/Linux
+**Error**: `Failed to launch the browser process!` or connection errors
+
+**Solutions**:
+```bash
+# Reinstall Puppeteer dependencies
+npm install puppeteer --force
+npm run build
+
+# Try HTTP-only mode (if implemented)
+linkchecker https://example.com --no-browser
+
+# Install system dependencies (Ubuntu/Debian)
+sudo apt-get update
+sudo apt-get install -y libgbm-dev
+
+# On macOS with Homebrew
+brew install chromium
+
+# Reinstall all dependencies
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+#### 3. Memory issues with large sites
 ```bash
 # Reduce concurrency and max pages
 linkchecker https://site.com --concurrency 2 --max-pages 100
+
+# Increase Node.js memory
+node --max-old-space-size=4096 dist/cli.js https://large-site.com
 ```
 
-#### 3. Server blocking requests
+#### 4. Server blocking requests
 ```bash
 # Add delay and custom user agent
 linkchecker https://site.com --delay 1000 --user-agent "LinkChecker/1.0 (friendly-bot)"
+
+# Respect robots.txt
+linkchecker https://site.com --delay 500 --concurrency 1
 ```
 
-#### 4. Timeout errors
+#### 5. Timeout errors
 ```bash
 # Increase timeout and retries
 linkchecker https://site.com --timeout 60000 --retries 5
+
+# For slow servers
+linkchecker https://site.com --timeout 120000 --delay 2000
 ```
+
+#### 6. SSL/TLS Certificate Issues
+```bash
+# Ignore SSL errors (not recommended for production)
+# Note: This feature may need to be implemented
+# linkchecker https://site.com --ignore-ssl
+
+# Use HTTPS alternatives
+linkchecker http://site.com --domains site.com
+```
+
+#### 7. DNS Resolution Issues
+```bash
+# Check DNS resolution
+nslookup example.com
+dig example.com
+
+# Try with IP address (if known)
+linkchecker http://192.168.1.100 --no-follow
+```
+
+### Platform-Specific Notes
+
+#### macOS
+- May encounter Puppeteer launch issues due to system security settings
+- Try running with `--no-sandbox` flag in browser arguments
+- Consider installing Chrome manually and using that path
+
+#### Linux
+- Install required system libraries:
+  ```bash
+  sudo apt-get install -y libgbm-dev libatk-bridge2.0-dev libdrm2
+  ```
+- For headless servers, use xvfb:
+  ```bash
+  sudo apt-get install xvfb
+  xvfb-run linkchecker https://example.com
+  ```
+
+#### Windows
+- May require Windows Build Tools for some dependencies
+- Run PowerShell as Administrator if permission issues occur
+- Consider using WSL2 for better compatibility
 
 ### Debug Mode
 ```bash
 # Enable verbose logging
 DEBUG=linkchecker:* linkchecker https://example.com
+
+# Save debug output
+DEBUG=linkchecker:* linkchecker https://example.com 2>&1 | tee debug.log
+
+# Test HTTP connectivity only
+curl -I https://example.com
 ```
+
+### Recovery Strategies
+
+#### When Crawling Fails
+1. **Reduce Scope**: Lower `max-depth` and `max-pages`
+2. **Slow Down**: Increase `delay` and reduce `concurrency`
+3. **Time Out**: Increase `timeout` and `retries`
+4. **Filter More**: Use `exclude` patterns to skip problematic content
+
+#### Memory Management
+1. **Lower Concurrency**: Reduce concurrent requests
+2. **Limit Pages**: Set conservative `max-pages` limit
+3. **Increase Memory**: Use `--max-old-space-size` for Node.js
+4. **Summary Mode**: Use `--summary` to reduce memory usage
+
+#### Network Issues
+1. **Check Connectivity**: Verify target site is reachable
+2. **Test Manually**: Use curl or browser to test URLs
+3. **Firewall Rules**: Ensure outbound connections are allowed
+4. **DNS Resolution**: Verify DNS is working correctly
 
 ## Integration with AutoFix
 

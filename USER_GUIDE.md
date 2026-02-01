@@ -353,6 +353,15 @@ sudo apt-get install -y chromium-browser
 
 # On macOS with Homebrew
 brew install chromium
+
+# For macOS Puppeteer issues, try:
+npm install puppeteer --force
+npm run build
+
+# Or reinstall all dependencies:
+rm -rf node_modules package-lock.json
+npm install
+npm run build
 ```
 
 #### 5. "Module not found" errors

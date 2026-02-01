@@ -79,7 +79,6 @@ export class LinkChecker {
     try {
       // Initialize browser with more robust settings
       this.browser = await puppeteer.launch({
-        headless: true,
         headless: 'new',
         args: [
           '--no-sandbox', 
@@ -110,7 +109,7 @@ export class LinkChecker {
         }
       } catch (closeError) {
         // Ignore close errors
-        console.warn('Browser close warning:', closeError.message);
+        console.warn('Browser close warning:', closeError instanceof Error ? closeError.message : String(closeError));
       }
     }
   }
